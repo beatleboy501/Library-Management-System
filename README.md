@@ -1,2 +1,6 @@
-# LibraryManagementSystem
-This library management system is an app I created as part of an internal Java course offered at my job. It uses Java SE 7 with the Swing library and originally made a connection to a local database using JDBC. At the moment it doesn't work as I am in the process of refactoring it to use best practices (I originally wrote it when I was first learning Java). It can be run self-contained.
+# Library Management System
+<hr>
+<p>
+  This library management system is an app I created as part of an internal Java course offered at my first job. It uses Java SE 7 with the Swing library and originally made a connection to a local database using JDBC. Now it just has some internal state that's seeded on startup
+</p>
+![Alt text](./screenshot.png?raw=true "Library Management System")
