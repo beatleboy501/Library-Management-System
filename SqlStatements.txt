@@ -1,0 +1,27 @@
+# Optional (If you're in Eastern Timezone, change parameters as needed)
+GRANT ALL PRIVILEGES ON *.* TO 'user'@'localhost' IDENTIFIED BY 'password';
+SET GLOBAL time_zone = '-6:00';
+
+# Create Database
+CREATE DATABASE lms;
+USE lms;
+
+# Create Books table and add item
+CREATE TABLE Books (id smallint unsigned not null auto_increment, Title varchar(50) not null, Author varchar(50), Year varchar(4), Genre varchar(25), Publisher varchar(50), constraint pk_example primary key (id) );
+INSERT INTO Books ( id, Title, Author, Year, Genre, Publisher) VALUES ( null, 'Sample Book Title', 'Sample Book Author', '2019', 'General Non-Fiction', 'Sample Book Publisher');
+
+# Create Newspapers table and add item
+CREATE TABLE Newspapers (id smallint unsigned not null auto_increment, Title varchar(50) not null, `Publication Date` date, constraint pk_example primary key (id) );
+INSERT INTO Newspapers ( id, Title, `Publication Date` ) VALUES ( null, 'Sample Newspaper Title', '2017-05-26' );
+
+# Create Magazines table and add item
+CREATE TABLE Magazines (id smallint unsigned not null auto_increment, Title varchar(50) not null, `Publication Date` date, constraint pk_example primary key (id) );
+INSERT INTO Magazines ( id, Title, `Publication Date` ) VALUES ( null, 'Sample Magazine Title', '2018-05-26' );
+
+# Create Audio table and add item
+CREATE TABLE Audio (id smallint unsigned not null auto_increment, Title varchar(50) not null, Author varchar(50), Year varchar(4), Genre varchar(25), Publisher varchar(50), constraint pk_example primary key (id) );
+INSERT INTO Audio ( id, Title, Author, Year, Genre, Publisher) VALUES ( null, 'Sample Audio Title', 'Sample Audio Author', '2019', 'General Non-Fiction', 'Sample Audio Publisher');
+
+# Create Visual table and add item
+CREATE TABLE Visual (id smallint unsigned not null auto_increment, Title varchar(50) not null, Author varchar(50), Year varchar(4), Genre varchar(25), Publisher varchar(50), constraint pk_example primary key (id) );
+INSERT INTO Visual ( id, Title, Author, Year, Genre, Publisher) VALUES ( null, 'Sample Visual Title', 'Sample Visual Author', '2019', 'General Non-Fiction', 'Sample Visual Publisher');

@@ -3,7 +3,7 @@ package com.library.ui;
 import javax.swing.*;
 
 /**
- * Created by allan06 on 8/16/2015.
+ * Created by beatleboy501 on 8/16/2015.
  */
 public class Form {
     private JTextField textField1;
@@ -11,7 +11,4 @@ public class Form {
     private JComboBox comboBox1;
     private JPanel panel1;
 
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
-    }
 }

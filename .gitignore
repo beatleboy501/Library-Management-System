@@ -1,6 +1,6 @@
-out
+out/
 .idea 
-
+*.DS_STORE*
 *.class
 *.iml
 .idea

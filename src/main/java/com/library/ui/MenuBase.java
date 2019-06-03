@@ -1,175 +1,163 @@
 package com.library.ui;
 
-import com.library.middlelayer.MiddleLayer;
-import com.library.server.DataAccess;
+import com.library.service.DataAccessService;
+import com.library.dataaccess.DataAccess;
 
 import javax.swing.*;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import static javax.swing.JTable.AUTO_RESIZE_OFF;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
- * Created by allan06 on 8/10/2015.
+ * Created by beatleboy501 on 8/10/2015
  */
-public class MenuBase extends JFrame {
-    JLabel searchBoxLabel = new JLabel("Search For");
-    JLabel menuLabel = new JLabel();
-    JLabel searchByLabel = new JLabel("Search By");
-    JLabel in = new JLabel("in");
-    JPanel bottomPanel = new JPanel();
-    JPanel holdAll = new JPanel();
-    JButton back = new JButton("Back to Main Menu");
-    JButton hyperLink = new JButton();
-    JButton searchButton = new JButton("Search");
-    JComboBox searchDropdownBox = new JComboBox();
-    JComboBox searchByDropdownBox = new JComboBox();
-    JTextField searchBox = new JTextField(15);
-    JTable searchResultPanel = new JTable();
+class MenuBase extends JFrame {
+    final JLabel searchBoxLabel = new JLabel("Search For");
+    final JLabel menuLabel = new JLabel();
+    final JLabel searchByLabel = new JLabel("Search By");
+    final JLabel inLabel = new JLabel("in");
+    final JPanel bottomPanel = new JPanel();
+    final JPanel containerPanel = new JPanel();
+    final JButton back = new JButton("Back to Main Menu");
+    final JButton searchButton = new JButton("Search");
+    final JButton addItemButton = new JButton("Add New Library Item");
+    final JComboBox searchDropdownBox = new JComboBox();
+    final JComboBox searchByDropdownBox = new JComboBox();
+    final JTextField searchBox = new JTextField(15);
+    final JTable searchResultPanel = new JTable();
     DataAccess data;
-    static ImageIcon img = new ImageIcon("C:\\Users\\allan06\\Pictures\\Burn.png");
 
-    public void runSelectedMenu(String item) {
+    void runSelectedMenu(String item, String facet, String facetValue) {
         removeCurrentWindow();
         menuLabel.setText(item.toUpperCase());
         bottomPanel.setLayout(new FlowLayout());
-
-//        JTable resultTable = autoFitContentTable(item);
-        JTable resultTable = table(item);
+        JTable resultTable = table(item, facet, facetValue);
         JScrollPane scrollPane = new JScrollPane(resultTable);
         resultTable.setFillsViewportHeight(true);
         bottomPanel.add(scrollPane);
         bottomPanel.add(back);
+        getContentPane().add(addItemButton, BorderLayout.SOUTH);
         back.addActionListener((ActionListener) this);
-        holdAll.setLayout(new BorderLayout());
-        holdAll.add(bottomPanel, BorderLayout.CENTER);
-        getContentPane().add(holdAll, BorderLayout.CENTER);
+        addItemButton.addActionListener((ActionListener) this);
+        containerPanel.setLayout(new BorderLayout());
+        containerPanel.add(bottomPanel, BorderLayout.CENTER);
+        getContentPane().add(containerPanel, BorderLayout.CENTER);
         getContentPane().add(menuLabel, BorderLayout.NORTH);
-
-        bottomPanel.revalidate();
-        bottomPanel.repaint();
-        holdAll.revalidate();
-        holdAll.repaint();
+        getContentPane().add(addItemButton, BorderLayout.SOUTH);
+        this.repaint();
+        this.revalidate();
         validate();
     }
 
-    private JTable autoFitContentTable(String item) {
-        final String i = item;
-        JTable resultTable = table(i);
-
-        resultTable.setAutoResizeMode(AUTO_RESIZE_OFF);
-
-        for (int column = 0; column < resultTable.getColumnCount(); column++)
-        {
-            TableColumn tableColumn = resultTable.getColumnModel().getColumn(column);
-            int preferredWidth = tableColumn.getMinWidth();
-            int maxWidth = tableColumn.getMaxWidth();
-
-            for (int row = 0; row < resultTable.getRowCount(); row++)
-            {
-                TableCellRenderer cellRenderer = resultTable.getCellRenderer(row, column);
-                Component c = resultTable.prepareRenderer(cellRenderer, row, column);
-                int width = c.getPreferredSize().width + resultTable.getIntercellSpacing().width;
-                preferredWidth = Math.max(preferredWidth, width);
-
-                //  We've exceeded the maximum width, no need to check other rows
-
-                if (preferredWidth >= maxWidth)
-                {
-                    preferredWidth = maxWidth;
-                    break;
-                }
-            }
-
-            tableColumn.setPreferredWidth( preferredWidth );
-        }
-        return resultTable;
-    }
-
-    public void reRunMainMenu() {
+    void reRunMainMenu() {
         removeCurrentWindow();
         bottomPanel.setLayout(new FlowLayout());
-
         bottomPanel.add(searchBoxLabel);
         bottomPanel.add(searchBox);
-        bottomPanel.add(in);
+        bottomPanel.add(inLabel);
         bottomPanel.add(searchDropdownBox);
         bottomPanel.add(searchByLabel);
         bottomPanel.add(searchByDropdownBox);
         bottomPanel.add(searchButton);
         searchButton.addActionListener((ActionListener) this);
-        holdAll.setLayout(new BorderLayout());
-        holdAll.add(bottomPanel, BorderLayout.CENTER);
-
-        getContentPane().add(holdAll, BorderLayout.CENTER);
+        addItemButton.addActionListener((ActionListener) this);
+        containerPanel.setLayout(new BorderLayout());
+        containerPanel.add(bottomPanel, BorderLayout.CENTER);
+        getContentPane().add(containerPanel, BorderLayout.CENTER);
         getContentPane().add(menuLabel, BorderLayout.NORTH);
-        getContentPane().add(hyperLink, BorderLayout.SOUTH);
-
+        getContentPane().add(addItemButton, BorderLayout.SOUTH);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        bottomPanel.repaint();
-        holdAll.repaint();
+        this.repaint();
+        this.revalidate();
         validate();
     }
 
-    public void removeCurrentWindow()
-    {
+    void removeCurrentWindow() {
         menuLabel.setText(null);
         getContentPane().remove(menuLabel);
-        getContentPane().remove(holdAll);
-        holdAll.remove(bottomPanel);
-        holdAll.invalidate();
+        getContentPane().remove(containerPanel);
+        containerPanel.remove(bottomPanel);
+        containerPanel.invalidate();
         bottomPanel.removeAll();
-        holdAll.removeAll();
+        containerPanel.removeAll();
+        addItemButton.removeActionListener((ActionListener) this);
     }
 
-    public JTable table(String item) {
-        final String i = item;
-        JTable table = new JTable();
+    JTable table(String item, String facet, String facetValue) {
+        JTable jTable = new JTable();
         try {
-            final String[] header = getHeaderRow(i);
-            final Object[][] data = getTableContent(i);
-            table = new JTable(data, header);
+            final String[] headers = getHeaderRow(item);
+            List<Object[]> tableContent = getTableContent(item, headers, facet, facetValue);
+            Object[][] data = tableContent.toArray(new Object[tableContent.size()][]);
+            jTable = new JTable(data, headers);
+        } catch (Exception e) {
+            System.out.println("Error showing table");
+            System.out.println(e.getMessage());
         }
-        catch (Exception e)
-        {
-
-        }
-        return table;
+        return jTable;
     }
 
-    public static String[] getHeaderRow(String item) {
-        final String i = item;
-        MiddleLayer ml = new MiddleLayer();
+    private static String[] getHeaderRow(String item) {
+        DataAccessService ml = new DataAccessService();
         String[] header = null;
         try {
-             header = ml.populateTableHeader(item);
+            System.out.println(item);
+            header = ml.populateTableHeader(item);
+        } catch (Exception e) {
+            System.out.println("Error getting header row");
+            System.out.println(e.getMessage());
         }
-        catch (Exception e) {
-
-        }
-        if(null==header) {
+        if (header == null) {
             throw new NullPointerException();
         }
         return header;
     }
 
-    public static Object[][] getTableContent(String item)
-    {
-        final String i = item;
-        MiddleLayer ml = new MiddleLayer();
-        Object[][] data = null;
+    private static List<Object[]> getTableContent(String item, String[] headers, String facet, String facetValue) {
+        DataAccessService service = new DataAccessService();
+        List<Object[]> data = new ArrayList<>();
         try {
-            data = ml.populateTableData(i);
+            data = service.populateTableData(item, headers, facet, facetValue);
+        } catch (Exception e) {
+            System.out.println("Error getting table content");
+            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
-        catch (Exception e)
-        {
-
-        }
-        if(null == data) {
+        if (data == null) {
             throw new NullPointerException();
         }
         return data;
+    }
+
+    void showAddNewLibraryItemDialog() {
+        data = new DataAccess();
+        Object[] possibilities = null;
+        try {
+            ArrayList<String> items = data.getLibraryItems();
+            possibilities = items.toArray(new Object[items.size()]);
+            for (Object item : possibilities) System.out.println(item.toString());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+        String s = (String)JOptionPane.showInputDialog(
+                this,
+                "Item to add:",
+                "Add New Library Item",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                possibilities,
+                Objects.requireNonNull(possibilities)[0]);
+
+        //If a string was returned, say so.
+        if ((s != null) && (s.length() > 0)) {
+            System.out.println(s);
+            return;
+        }
+        //If you're here, the return value was null/empty.
+        System.out.println("Add item cancelled");
     }
 }

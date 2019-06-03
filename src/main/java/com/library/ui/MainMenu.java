@@ -1,125 +1,96 @@
 package com.library.ui;
 
-import com.library.server.DataAccess;
+import com.library.dataaccess.DataAccess;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
- * Created by allan06 on 8/10/2015.
+ * Created by beatleboy501 on 8/10/2015.
  */
-public class MainMenu extends MenuBase implements ActionListener
-{
-    public MainMenu()
-    {
+public class MainMenu extends MenuBase implements ActionListener {
+    private MainMenu() {
         menuLabel.setText("Main Menu");
-
-        hyperLink.setText("<HTML>Click <FONT color=\"#000099\"><U>here</U></FONT>"
-                + " to go to the LMS website.</HTML>");
-        hyperLink.setHorizontalAlignment(SwingConstants.LEFT);
-        hyperLink.setBorderPainted(false);
-        hyperLink.setOpaque(false);
-        hyperLink.setBackground(Color.WHITE);
         bottomPanel.setLayout(new FlowLayout());
         bottomPanel.add(searchBoxLabel);
         searchBox.setBounds(10, 35, 150, 20);
         bottomPanel.add(searchBox);
-        bottomPanel.add(in);
-        populateDropdown(searchDropdownBox);
+        bottomPanel.add(inLabel);
+        populateDropdown();
         bottomPanel.add(searchDropdownBox);
         bottomPanel.add(searchByLabel);
         bottomPanel.add(searchByDropdownBox);
         bottomPanel.add(searchButton);
         bottomPanel.add(searchResultPanel);
-
-        holdAll.setLayout(new BorderLayout());
-        holdAll.add(bottomPanel, BorderLayout.CENTER);
-
-        getContentPane().add(holdAll, BorderLayout.CENTER);
+        containerPanel.setLayout(new BorderLayout());
+        containerPanel.add(bottomPanel, BorderLayout.CENTER);
+        getContentPane().add(containerPanel, BorderLayout.CENTER);
         getContentPane().add(menuLabel, BorderLayout.NORTH);
-        getContentPane().add(hyperLink, BorderLayout.SOUTH);
+        getContentPane().add(addItemButton, BorderLayout.SOUTH);
         searchButton.addActionListener(this);
-
+        addItemButton.addActionListener(this);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
     private void populateSearchBy() {
-        try{
-            ArrayList<String> criteria = new ArrayList<String>();
-            criteria.add("Title");
-            criteria.add("Author");
-            for(String s : criteria)
-            {
-                searchByDropdownBox.addItem(s);
-            }
-        }
-        catch(Exception e)
-        {
-            JOptionPane popup = new JOptionPane();
-            popup.showMessageDialog(null, "Error: could not populate the list of search criteria", "Error", JOptionPane.INFORMATION_MESSAGE);
+        try {
+            ArrayList<String> facets = new ArrayList<>();
+            facets.add("Title");
+            facets.add("id");
+            for (String facet : facets) searchByDropdownBox.addItem(facet);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error: could not populate the list of search criteria", "Error", JOptionPane.INFORMATION_MESSAGE);
             System.out.println("ERROR: could not populate the list of search criteria");
             e.printStackTrace();
         }
     }
 
-    /**
-     *
-     * @param searchDropdownBox
-     */
-    public void populateDropdown(JComboBox searchDropdownBox) {
+    private void populateDropdown() {
         data = new DataAccess();
-        try{
+        try {
             ArrayList<String> items = data.getLibraryItems();
-            for(String s : items)
-            {
-                searchDropdownBox.addItem(s);
-            }
-        }
-        catch(Exception e)
-        {
-            JOptionPane popup = new JOptionPane();
-            popup.showMessageDialog(null, "Error: could not populate the list of items", "Error", JOptionPane.INFORMATION_MESSAGE);
+            for (String item : items) searchDropdownBox.addItem(item);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error: could not populate the list of items", "Error", JOptionPane.INFORMATION_MESSAGE);
             System.out.println("ERROR: could not populate the list of items");
             e.printStackTrace();
             System.exit(1);
-        }
-        finally {
+        } finally {
             data = null;
         }
     }
 
-    public static void main(String[] args) throws Exception
-    {
+    public static void main(String[] args) throws Exception {
         runMainMenu();
-
     }
 
-    public static void runMainMenu()
-    {
+    private static void runMainMenu() {
         MainMenu myApplication = new MainMenu();
         myApplication.setTitle("Library Management System");
         // Specify where will it appear on the screen:
         myApplication.setLocation(10, 10);
-        myApplication.setSize(800, 1000);
-        myApplication.setIconImage(img.getImage());
+        myApplication.setSize(500, 500);
         // Show it!
         myApplication.setVisible(true);
         myApplication.populateSearchBy();
     }
 
-    public void actionPerformed(ActionEvent e)
-    {
-        if (e.getSource() == searchButton)
-        {
-            String getSelection = searchDropdownBox.getSelectedItem().toString();
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == searchButton) {
+            String getSelection = Objects.requireNonNull(searchDropdownBox.getSelectedItem()).toString();
+            String facet = Objects.requireNonNull(searchByDropdownBox.getSelectedItem()).toString();
+            String facetValue = searchBox.getText();
             searchButton.removeActionListener(this);
-            runSelectedMenu(getSelection);
-        }
-        else if (e.getSource() == back) {
+            runSelectedMenu(getSelection, facet, facetValue);
+        } else if (e.getSource() == back) {
             reRunMainMenu();
+        } else if (e.getSource() == addItemButton){
+            addItemButton.removeActionListener(this);
+            showAddNewLibraryItemDialog();
         }
     }
 }
